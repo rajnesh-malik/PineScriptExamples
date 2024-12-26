@@ -1,0 +1,45 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © rajneshmalik
+
+
+//@version=5
+strategy("Double MA Crossover Strategy", overlay=true)
+
+// Input for the short and long moving averages
+short_window = input.int(8, title="Short-term Moving Average", minval=1)
+long_window = input.int(14, title="Long-term Moving Average", minval=1)
+
+// Calculate moving averages
+short_ma = ta.sma(close, short_window)
+long_ma = ta.sma(close, long_window)
+
+// Plot the moving averages on the chart
+plot(short_ma, color=color.blue, linewidth=2, title="Short-term MA")
+plot(long_ma, color=color.red, linewidth=2, title="Long-term MA")
+
+// Define the crossover condition
+long_condition = ta.crossover(short_ma, long_ma)  // Buy signal when short MA crosses above long MA
+
+// Profit and stop-loss levels
+profit_target = 0.001  // 0.1% profit
+stop_loss = 0.002     // 0.2% stop loss
+
+// Track entry price for each trade
+var float entry_price = na
+
+// Execute the strategy
+if (long_condition)
+    entry_price := close  // Capture the entry price on crossover
+    strategy.entry("Buy", strategy.long)  // Enter long position
+
+// Calculate the stop-loss and take-profit levels
+long_stop_loss = entry_price * (1 - stop_loss)
+long_take_profit = entry_price * (1 + profit_target)
+
+// Exit conditions based on stop-loss and take-profit
+strategy.exit("Take Profit / Stop Loss", "Buy", stop=long_stop_loss, limit=long_take_profit)
+
+// Plot stop-loss and take-profit levels for visualization
+plot(entry_price * (1 - stop_loss), color=color.red, linewidth=1, style=plot.style_linebr, title="Stop-Loss Level")
+plot(entry_price * (1 + profit_target), color=color.green, linewidth=1, style=plot.style_linebr, title="Take-Profit Level")
+
