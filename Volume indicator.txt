@@ -1,0 +1,17 @@
+//@version=5
+indicator("Volume Indicator", overlay=false)
+
+// Get the current and previous volume
+currentVolume = volume
+previousVolume = ta.valuewhen(true, volume[1], 0)
+
+// Color the bars based on whether the volume is higher or lower than the previous bar
+volumeColor = currentVolume > previousVolume ? color.green : color.red
+
+// Plot the volume as a histogram
+plot(currentVolume, color=volumeColor, style=plot.style_histogram, linewidth=1, title="Volume")
+
+// Optional: Add a moving average of volume to the chart for trend analysis
+smaLength = input(20, title="SMA Length for Volume")
+smaVolume = ta.sma(currentVolume, smaLength)
+plot(smaVolume, color=color.blue, title="Volume SMA")
