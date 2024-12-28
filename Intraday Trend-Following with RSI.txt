@@ -1,0 +1,26 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © rajneshmalik
+
+//@version=5
+indicator("Intraday Trend-Following with RSI", overlay=true)
+
+// Input parameters
+rsiPeriod = input(14, title="RSI Period")
+overbought = input(70, title="Overbought Level")
+oversold = input(30, title="Oversold Level")
+
+// Calculate RSI
+rsi = ta.rsi(close, rsiPeriod)
+
+// Define Buy/Sell signals
+buySignal = ta.crossover(rsi, oversold)
+sellSignal = ta.crossunder(rsi, overbought)
+
+// Plot Buy/Sell signals on the chart
+plotshape(series=buySignal, location=location.belowbar, color=color.green, style=shape.labelup, text="BUY")
+plotshape(series=sellSignal, location=location.abovebar, color=color.red, style=shape.labeldown, text="SELL")
+
+// Plot RSI for reference
+plot(rsi, title="RSI", color=color.blue)
+hline(overbought, "Overbought", color=color.red)
+hline(oversold, "Oversold", color=color.green)
