@@ -1,0 +1,64 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © rajneshmalik
+//@version=5
+indicator("Elliott Waves with Fibonacci Retracements", overlay=true)
+
+// Input parameters
+length = input.int(5, title="ZigZag Length")
+deviation = input.float(5.0, title="ZigZag Deviation (%)")
+period = input.int(100, title="Lookback Period")
+// ZigZag algorithm
+zigzagHigh = ta.highest(high, length)
+zigzagLow = ta.lowest(low, length)
+zigzagPivotHigh = high > zigzagHigh[1] and high[1] > zigzagHigh[2] ? high : na
+zigzagPivotLow = low < zigzagLow[1] and low[1] < zigzagLow[2] ? low : na
+
+// Declare and initialize arrays
+var float[] peaks = array.new_float(0)
+var float[] troughs = array.new_float(0)
+
+// Add detected peaks and troughs
+if not na(zigzagPivotHigh)
+    array.push(peaks, zigzagPivotHigh)
+if not na(zigzagPivotLow)
+    array.push(troughs, zigzagPivotLow)
+
+// Ensure arrays are bounded
+if array.size(peaks) > 10
+    array.shift(peaks)
+if array.size(troughs) > 10
+    array.shift(troughs)
+
+// Determine the last peak and trough
+peak = array.size(peaks) > 0 ? array.get(peaks, array.size(peaks) - 1) : na
+trough = array.size(troughs) > 0 ? array.get(troughs, array.size(troughs) - 1) : na
+
+// Plot ZigZag lines
+plotshape(series=zigzagPivotHigh, style=shape.triangleup, location=location.abovebar, color=color.green, size=size.small)
+plotshape(series=zigzagPivotLow, style=shape.triangledown, location=location.belowbar, color=color.red, size=size.small)
+
+// Input for high and low points for Fibonacci 
+var float highLevel = high 
+var float lowLevel = low
+
+// Update high and low points based on the highest high and lowest low over the lookback period 
+highLevel := ta.highest(high, period) 
+lowLevel := ta.lowest(low, period)
+
+// Calculate Fibonacci levels 
+fib_0 = lowLevel 
+fib_100 = highLevel 
+fib_236 = fib_0 + (fib_100 - fib_0) * 0.236 
+fib_382 = fib_0 + (fib_100 - fib_0) * 0.382 
+fib_50 = fib_0 + (fib_100 - fib_0) * 0.5 
+fib_618 = fib_0 + (fib_100 - fib_0) * 0.618 
+fib_786 = fib_0 + (fib_100 - fib_0) * 0.786
+
+// Plot Fibonacci levels 
+plot(fib_0, color=color.red, title="Fib 0%") 
+plot(fib_236, color=color.orange, title="Fib 23.6%") 
+plot(fib_382, color=color.yellow, title="Fib 38.2%") 
+plot(fib_50, color=color.green, title="Fib 50%") 
+plot(fib_618, color=color.blue, title="Fib 61.8%") 
+plot(fib_786, color=color.purple, title="Fib 78.6%") 
+plot(fib_100, color=color.red, title="Fib 100%")
